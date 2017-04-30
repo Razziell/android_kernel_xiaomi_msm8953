@@ -542,6 +542,7 @@ struct fg_chip {
 	bool			fg_shutdown;
 	bool			use_soft_jeita_irq;
 	bool			allow_false_negative_isense;
+	bool			use_full_soc_irq;
 	struct delayed_work	update_jeita_setting;
 	struct delayed_work	update_sram_data;
 	struct delayed_work	update_temp_work;
@@ -1334,7 +1335,7 @@ static void fg_enable_irqs(struct fg_chip *chip, bool enable)
 	if (enable) {
 		enable_irq(chip->soc_irq[DELTA_SOC].irq);
 		enable_irq_wake(chip->soc_irq[DELTA_SOC].irq);
-		if (!chip->full_soc_irq_enabled) {
+		if (!chip->full_soc_irq_enabled && chip->use_full_soc_irq) {
 			enable_irq(chip->soc_irq[FULL_SOC].irq);
 			enable_irq_wake(chip->soc_irq[FULL_SOC].irq);
 			chip->full_soc_irq_enabled = true;
@@ -1353,7 +1354,7 @@ static void fg_enable_irqs(struct fg_chip *chip, bool enable)
 	} else {
 		disable_irq_wake(chip->soc_irq[DELTA_SOC].irq);
 		disable_irq_nosync(chip->soc_irq[DELTA_SOC].irq);
-		if (chip->full_soc_irq_enabled) {
+		if (chip->full_soc_irq_enabled && chip->use_full_soc_irq) {
 			disable_irq_wake(chip->soc_irq[FULL_SOC].irq);
 			disable_irq_nosync(chip->soc_irq[FULL_SOC].irq);
 			chip->full_soc_irq_enabled = false;
@@ -3973,7 +3974,7 @@ static void status_change_work(struct work_struct *work)
 			chip->vbat_low_irq_enabled = true;
 		}
 
-		if (!chip->full_soc_irq_enabled) {
+		if (!chip->full_soc_irq_enabled && chip->use_full_soc_irq) {
 			enable_irq(chip->soc_irq[FULL_SOC].irq);
 			enable_irq_wake(chip->soc_irq[FULL_SOC].irq);
 			chip->full_soc_irq_enabled = true;
@@ -3989,7 +3990,7 @@ static void status_change_work(struct work_struct *work)
 			chip->vbat_low_irq_enabled = false;
 		}
 
-		if (chip->full_soc_irq_enabled) {
+		if (chip->full_soc_irq_enabled && chip->use_full_soc_irq) {
 			disable_irq_wake(chip->soc_irq[FULL_SOC].irq);
 			disable_irq_nosync(chip->soc_irq[FULL_SOC].irq);
 			chip->full_soc_irq_enabled = false;
@@ -7115,6 +7116,9 @@ static int fg_of_init(struct fg_chip *chip)
 			chip->batt_info_restore, fg_batt_valid_ocv,
 			fg_batt_range_pct);
 
+	chip->use_full_soc_irq = of_property_read_bool(node,
+					"qcom,fg-use-full-soc-irq");
+
 	return rc;
 }
 
@@ -7154,11 +7158,13 @@ static int fg_init_irqs(struct fg_chip *chip)
 
 		switch (subtype) {
 		case FG_SOC:
-			chip->soc_irq[FULL_SOC].irq = spmi_get_irq_byname(
-					chip->spmi, spmi_resource, "full-soc");
-			if (chip->soc_irq[FULL_SOC].irq < 0) {
-				pr_err("Unable to get full-soc irq\n");
-				return rc;
+			if (chip->use_full_soc_irq) {
+				chip->soc_irq[FULL_SOC].irq = spmi_get_irq_byname(
+						chip->spmi, spmi_resource, "full-soc");
+				if (chip->soc_irq[FULL_SOC].irq < 0) {
+					pr_err("Unable to get full-soc irq\n");
+					return rc;
+				}
 			}
 			chip->soc_irq[EMPTY_SOC].irq = spmi_get_irq_byname(
 					chip->spmi, spmi_resource, "empty-soc");
@@ -7179,14 +7185,16 @@ static int fg_init_irqs(struct fg_chip *chip)
 				return rc;
 			}
 
-			rc = devm_request_irq(chip->dev,
-				chip->soc_irq[FULL_SOC].irq,
-				fg_soc_irq_handler, IRQF_TRIGGER_RISING,
-				"full-soc", chip);
-			if (rc < 0) {
-				pr_err("Can't request %d full-soc: %d\n",
-					chip->soc_irq[FULL_SOC].irq, rc);
-				return rc;
+			if (chip->use_full_soc_irq) {
+				rc = devm_request_irq(chip->dev,
+					chip->soc_irq[FULL_SOC].irq,
+					fg_soc_irq_handler, IRQF_TRIGGER_RISING,
+					"full-soc", chip);
+				if (rc < 0) {
+					pr_err("Can't request %d full-soc: %d\n",
+						chip->soc_irq[FULL_SOC].irq, rc);
+					return rc;
+				}
 			}
 			enable_irq_wake(chip->soc_irq[FULL_SOC].irq);
 			chip->full_soc_irq_enabled = true;
