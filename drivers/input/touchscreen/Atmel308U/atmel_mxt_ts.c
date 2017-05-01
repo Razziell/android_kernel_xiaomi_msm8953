@@ -2642,6 +2642,7 @@ static int mxt_check_reg_init(struct mxt_data *data)
 {
 	struct device *dev = &data->client->dev;
 	int ret;
+	u8 tp_color;
 	u32 k = 0;
 
 	bool is_recheck = false, use_default_cfg = false;
