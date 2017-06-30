@@ -1057,12 +1057,16 @@ static int send_per_pkt_stats_to_user(void)
 		spin_unlock_irqrestore(&gwlan_logging.pkt_stats_lock, flags);
 
 		vos_mem_zero(&pktlog, sizeof(vos_log_pktlog_info));
+#ifdef FEATURE_WLAN_DIAG_SUPPORT
 		vos_log_set_code(&pktlog, LOG_WLAN_PKT_LOG_INFO_C);
+#endif
 
 		pktlog.version = VERSION_LOG_WLAN_PKT_LOG_INFO_C;
 		pktlog.buf_len = plog_msg->skb->len;
+#ifdef FEATURE_WLAN_DIAG_SUPPORT
 		vos_log_set_length(&pktlog.log_hdr, plog_msg->skb->len +
 					sizeof(vos_log_pktlog_info));
+#endif
 		pktlog.seq_no = gwlan_logging.pkt_stats_msg_idx++;
 
 		if (unlikely(skb_headroom(plog_msg->skb) < sizeof(vos_log_pktlog_info))) {

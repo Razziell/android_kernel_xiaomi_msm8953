@@ -6736,12 +6736,14 @@ static int __iw_setnone_getint(struct net_device *dev,
             break;
         }
 
+#ifdef WLAN_DEBUG
         case WE_GET_WDI_DBG:
         {
            wpalTraceDisplay();
            *value = 0;
            break;
         }
+#endif
 
         case WE_GET_SAP_AUTO_CHANNEL_SELECTION:
         {
@@ -6834,11 +6836,13 @@ int __iw_set_three_ints_getnone(struct net_device *dev,
             vos_trace_setValue( value[1], value[2], value[3]);
             break;
         }
+#ifdef WLAN_DEBUG
         case WE_SET_WDI_DBG:
         {
             wpalTraceSetLevel( value[1], value[2], value[3]);
             break;
         }
+#endif
         case WE_SET_SAP_CHANNELS:
         {
             ret = iw_softap_set_channel_range( dev, value[1], value[2], value[3]);
@@ -7143,6 +7147,7 @@ static int __iw_get_char_setnone(struct net_device *dev,
                 tlState = smeGetTLSTAState(hHal, pHddStaCtx->conn_info.staId[0]);
 
                 buf = scnprintf(extra + len, WE_MAX_STR_LEN - len,
+#ifdef TRACE_RECORD
                         "\n HDD Conn State - %s "
                         "\n \n SME State:"
                         "\n Neighbour Roam State - %s"
@@ -7159,6 +7164,9 @@ static int __iw_get_char_setnone(struct net_device *dev,
                                 pMac->roam.curSubState[useAdapter->sessionId]),
                         pHddStaCtx->conn_info.staId[0],
                         macTraceGetTLState(tlState)
+#else
+			"\n"
+#endif
                         );
                 len += buf;
                 adapter_num++;
@@ -7167,12 +7175,16 @@ static int __iw_get_char_setnone(struct net_device *dev,
             if (pMac) {
                 /* Printing Lim State starting with global lim states */
                 buf = scnprintf(extra + len, WE_MAX_STR_LEN - len,
+#ifdef TRACE_RECORD
                         "\n \n LIM STATES:-"
                         "\n Global Sme State - %s "\
                         "\n Global mlm State - %s "\
                         "\n",
                         macTraceGetLimSmeState(pMac->lim.gLimSmeState),
                         macTraceGetLimMlmState(pMac->lim.gLimMlmState)
+#else
+			"\n"
+#endif
                         );
                 len += buf;
 
@@ -7182,6 +7194,7 @@ static int __iw_get_char_setnone(struct net_device *dev,
                     if ( pMac->lim.gpSession[count].valid )
                     {
                         buf = scnprintf(extra + len, WE_MAX_STR_LEN - len,
+#ifdef TRACE_RECORD
                         "\n Lim Valid Session %d:-"
                         "\n PE Sme State - %s "
                         "\n PE Mlm State - %s "
@@ -7189,6 +7202,9 @@ static int __iw_get_char_setnone(struct net_device *dev,
                         check,
                         macTraceGetLimSmeState(pMac->lim.gpSession[count].limSmeState),
                         macTraceGetLimMlmState(pMac->lim.gpSession[count].limMlmState)
+#else
+			"\n"
+#endif
                         );
 
                         len += buf;

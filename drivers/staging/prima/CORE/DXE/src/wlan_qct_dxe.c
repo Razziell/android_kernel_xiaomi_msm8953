@@ -196,6 +196,7 @@ static wpt_status dxeChannelMonitor
       return eWLAN_PAL_STATUS_E_INVAL;
    }
 
+#ifdef WLAN_DEBUG
    wpalTrace(eWLAN_MODULE_DAL_DATA, eWLAN_PAL_TRACE_LEVEL_FATAL,
              "%11s : HCBO %d, HCBDP 0x%x, HCBDC 0x%x,",
              channelType[channelEntry->channelType],
@@ -214,6 +215,7 @@ static wpt_status dxeChannelMonitor
              channelEntry->numFreeDesc,
              channelEntry->numRsvdDesc,
              channelEntry->numTotalFrame);
+#endif
 
    if(channelLog)
    {
@@ -375,10 +377,12 @@ wpt_status dxeChannelRegisterDump
    wpalReadRegister(channelEntry->channelRegister.chDXECtrlRegAddr, &chControlReg);
    wpalReadRegister(channelEntry->channelRegister.chDXEStatusRegAddr, &chStatusReg);
 
+#ifdef WLAN_DEBUG
    wpalTrace(eWLAN_MODULE_DAL_DATA, eWLAN_PAL_TRACE_LEVEL_FATAL,
              "%11s : CCR 0x%x, CSR 0x%x, CDR 0x%x, CLDR 0x%x",
              channelType[channelEntry->channelType],
              chControlReg, chStatusReg, chDescReg, chLDescReg);
+#endif
 
    if(channelLog)
    {

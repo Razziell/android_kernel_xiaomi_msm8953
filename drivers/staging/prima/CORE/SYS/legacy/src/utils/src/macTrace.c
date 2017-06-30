@@ -206,6 +206,7 @@ tANI_U8* macTraceGetcsrRoamSubState(tANI_U16 csrRoamSubState)
     }
 }
 
+#ifdef TRACE_RECORD
 /* ---------------------------------------------------------------------------
     \fn macTraceGetLimSmeState
     \function to get string equivalent of a value
@@ -246,7 +247,9 @@ tANI_U8* macTraceGetLimSmeState(tANI_U16 limState)
             break;
     }
 }
+#endif
 
+#ifdef TRACE_RECORD
 /* ---------------------------------------------------------------------------
     \fn macTraceGetLimMlmState
     \function to get string equivalent of a value
@@ -291,6 +294,7 @@ tANI_U8* macTraceGetLimMlmState(tANI_U16 mlmState)
             break;
     }
 }
+#endif
 
 /* ---------------------------------------------------------------------------
     \fn macTraceGetTLState
