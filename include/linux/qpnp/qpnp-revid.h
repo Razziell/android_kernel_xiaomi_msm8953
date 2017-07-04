@@ -169,7 +169,11 @@
 #define PMK8001_SUBTYPE		0x12
 
 /* PMI8996 */
+#ifdef CONFIG_MACH_XIAOMI_MARKW
+#define PMI8996_SUBTYPE		19
+#else
 #define PMI8996_SUBTYPE		0x13
+#endif
 
 /* PMCOBALT */
 #define PMCOBALT_SUBTYPE	0x14
