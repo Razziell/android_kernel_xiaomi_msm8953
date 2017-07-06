@@ -153,10 +153,11 @@ static int read_eeprom_memory(struct msm_eeprom_ctrl_t *e_ctrl,
 	struct msm_eeprom_board_info *eb_info;
 	uint8_t *memptr = block->mapdata;
 
+#ifndef CONFIG_MACH_XIAOMI_MARKW
 	uint8_t sensor_id[2] = {0};
 
 	pr_err("%s %d\n", __func__, __LINE__);
-
+#endif
 	if (!e_ctrl) {
 		pr_err("%s e_ctrl is NULL", __func__);
 		return -EINVAL;
@@ -164,6 +165,7 @@ static int read_eeprom_memory(struct msm_eeprom_ctrl_t *e_ctrl,
 
 	eb_info = e_ctrl->eboard_info;
 
+#ifndef CONFIG_MACH_XIAOMI_MARKW
 	if (1) {
 		e_ctrl->i2c_client.addr_type = 2;
 		rc = e_ctrl->i2c_client.i2c_func_tbl->i2c_read_seq(
@@ -176,7 +178,7 @@ static int read_eeprom_memory(struct msm_eeprom_ctrl_t *e_ctrl,
 
 		CDBG("%s %d addr [0x0000] = %x, [0x0001] = %x\n", __func__, __LINE__, sensor_id[0], sensor_id[1]);
 	}
-
+#endif
 	for (j = 0; j < block->num_map; j++) {
 		if (emap[j].saddr.addr) {
 			eb_info->i2c_slaveaddr = emap[j].saddr.addr;
@@ -433,7 +435,11 @@ static int eeprom_parse_memory_map(struct msm_eeprom_ctrl_t *e_ctrl,
 	}
 	memptr = e_ctrl->cal_data.mapdata;
 	for (i = 0; i < e_ctrl->cal_data.num_data; i++)
+#ifdef CONFIG_MACH_XIAOMI_MARKW
+		CDBG("memory_data[%d] = 0x%X\n", i, memptr[i]);
+#else
 		CDBG("%s %d memory_data[%d] = 0x%X\n", __func__, __LINE__, i, memptr[i]);
+#endif
 	return rc;
 
 clean_up:
@@ -1533,13 +1539,18 @@ static int msm_eeprom_config32(struct msm_eeprom_ctrl_t *e_ctrl,
 		rc = eeprom_config_read_cal_data32(e_ctrl, argp);
 		break;
 	case CFG_EEPROM_INIT:
+#ifndef CONFIG_MACH_XIAOMI_MARKW
 		if (e_ctrl->userspace_probe == 0) {
 			pr_err("%s:%d Eeprom already probed at kernel boot",
 				__func__, __LINE__);
 			rc = -EINVAL;
 			break;
 		}
+#endif
 		if (e_ctrl->cal_data.num_data == 0) {
+#ifdef CONFIG_MACH_XIAOMI_MARKW
+			pr_err("%s:%d \n", __func__, __LINE__);
+#endif
 			rc = eeprom_init_config32(e_ctrl, argp);
 			if (rc < 0)
 				pr_err("%s:%d Eeprom init failed\n",
@@ -1740,8 +1751,13 @@ static int msm_eeprom_platform_probe(struct platform_device *pdev)
 			goto power_down;
 		}
 		for (j = 0; j < e_ctrl->cal_data.num_data; j++)
+#ifdef CONFIG_MACH_XIAOMI_MARKW
+			CDBG("memory_data[%d] = 0x%X\n", j,
+  				e_ctrl->cal_data.mapdata[j]);
+#else
 			CDBG("%s %d memory_data[%d] = 0x%X\n", __func__, __LINE__, j,
 				e_ctrl->cal_data.mapdata[j]);
+#endif
 
 		e_ctrl->is_supported |= msm_eeprom_match_crc(&e_ctrl->cal_data);
 
