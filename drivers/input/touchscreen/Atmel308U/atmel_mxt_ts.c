@@ -5344,9 +5344,11 @@ static int mxt_initialize_input_device(struct mxt_data *data)
 
 	if (data->pdata->input_name) {
 		input_dev->name = data->pdata->input_name;
+		dev_dbg(dev, "MXT name: %s", input_dev->name);
 	} else {
 		input_dev->name = "atmel-maxtouch";
 	}
+	dev_dbg(dev, "MXT name: %s", input_dev->name);
 
 	input_dev->id.bustype = BUS_I2C;
 	input_dev->dev.parent = dev;
