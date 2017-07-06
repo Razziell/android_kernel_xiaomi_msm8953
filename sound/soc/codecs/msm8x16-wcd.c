@@ -34,6 +34,11 @@
 #include <linux/workqueue.h>
 #include <linux/sched.h>
 #include <sound/q6afe-v2.h>
+
+#ifdef CONFIG_MACH_XIAOMI_MARKW
+#include <linux/switch.h>
+#endif
+
 #include <sound/pcm.h>
 #include <sound/pcm_params.h>
 #include <sound/soc.h>
@@ -99,7 +104,11 @@ enum {
 #define SPK_PMD 2
 #define SPK_PMU 3
 
+#ifdef CONFIG_MACH_XIAOMI_MARKW
+#define MICBIAS_DEFAULT_VAL 2700000
+#else
 #define MICBIAS_DEFAULT_VAL 1800000
+#endif
 #define MICBIAS_MIN_VAL 1600000
 #define MICBIAS_STEP_SIZE 50000
 
@@ -134,7 +143,14 @@ static const DECLARE_TLV_DB_SCALE(digital_gain, 0, 1, 0);
 static const DECLARE_TLV_DB_SCALE(analog_gain, 0, 25, 1);
 static struct snd_soc_dai_driver msm8x16_wcd_i2s_dai[];
 /* By default enable the internal speaker boost */
+#ifdef CONFIG_MACH_XIAOMI_MARKW
+static struct switch_dev accdet_data;
+static int accdet_state;
+
+static bool spkr_boost_en;
+#else
 static bool spkr_boost_en = true;
+#endif
 
 #define MSM8X16_WCD_ACQUIRE_LOCK(x) \
 	mutex_lock_nested(&x, SINGLE_DEPTH_NESTING)
@@ -664,9 +680,15 @@ static void msm8x16_wcd_mbhc_internal_micbias_ctrl(struct snd_soc_codec *codec,
 {
 	if (micbias_num == 1) {
 		if (enable)
+#ifdef CONFIG_MACH_XIAOMI_MARKW
+			snd_soc_update_bits(codec,
+				MSM8X16_WCD_A_ANALOG_MICB_1_INT_RBIAS,
+				0x18, 0x18);
+#else
 			snd_soc_update_bits(codec,
 				MSM8X16_WCD_A_ANALOG_MICB_1_INT_RBIAS,
 				0x10, 0x10);
+#endif
 		else
 			snd_soc_update_bits(codec,
 				MSM8X16_WCD_A_ANALOG_MICB_1_INT_RBIAS,
@@ -1163,6 +1185,12 @@ static int __msm8x16_wcd_reg_read(struct snd_soc_codec *codec,
 	pr_debug("%s reg = %x\n", __func__, reg);
 	mutex_lock(&msm8x16_wcd->io_lock);
 	pdata = snd_soc_card_get_drvdata(codec->component.card);
+#ifdef CONFIG_MACH_XIAOMI_MARKW
+	if (pdata == NULL) {
+		mutex_unlock(&msm8x16_wcd->io_lock);
+		return ret;
+	}
+#endif
 	if (MSM8X16_WCD_IS_TOMBAK_REG(reg))
 		ret = msm8x16_wcd_spmi_read(reg, 1, &temp);
 	else if (MSM8X16_WCD_IS_DIGITAL_REG(reg)) {
@@ -1219,6 +1247,12 @@ static int __msm8x16_wcd_reg_write(struct snd_soc_codec *codec,
 
 	mutex_lock(&msm8x16_wcd->io_lock);
 	pdata = snd_soc_card_get_drvdata(codec->component.card);
+#ifdef CONFIG_MACH_XIAOMI_MARKW
+	if (pdata == NULL) {
+		mutex_unlock(&msm8x16_wcd->io_lock);
+		return ret;
+	}
+#endif
 	if (MSM8X16_WCD_IS_TOMBAK_REG(reg))
 		ret = msm8x16_wcd_spmi_write(reg, 1, &val);
 	else if (MSM8X16_WCD_IS_DIGITAL_REG(reg)) {
@@ -4309,7 +4343,19 @@ static int msm8x16_wcd_hphr_dac_event(struct snd_soc_dapm_widget *w,
 	}
 	return 0;
 }
+#ifdef CONFIG_MACH_XIAOMI_MARKW
+void msm8x16_wcd_codec_set_headset_state(u32 state)
+{
+	switch_set_state((struct switch_dev *)&accdet_data, state);
+	accdet_state = state;
+}
 
+int msm8x16_wcd_codec_get_headset_state(void)
+{
+	pr_debug("%s accdet_state = %d\n", __func__, accdet_state);
+	return accdet_state;
+}
+#endif
 static int msm8x16_wcd_hph_pa_event(struct snd_soc_dapm_widget *w,
 			      struct snd_kcontrol *kcontrol, int event)
 {
@@ -4458,7 +4504,9 @@ static const struct snd_soc_dapm_route audio_map[] = {
 	{"LINEOUT PA", NULL, "LINE_OUT"},
 	{"LINE_OUT", "Switch", "LINEOUT DAC"},
 	{"LINEOUT DAC", NULL, "RX3 CHAIN"},
+#ifndef CONFIG_MACH_XIAOMI_MARKW
 	{ "Ext Spk", NULL, "LINEOUT PA"},
+#endif
 	/* lineout to WSA */
 	{"WSA_SPK OUT", NULL, "LINEOUT PA"},
 
@@ -5854,7 +5902,17 @@ static int msm8x16_wcd_codec_probe(struct snd_soc_codec *codec)
 
 	wcd_mbhc_init(&msm8x16_wcd_priv->mbhc, codec, &mbhc_cb, &intr_ids,
 		      wcd_mbhc_registers, true);
+#ifdef CONFIG_MACH_XIAOMI_MARKW
+	accdet_data.name = "h2w";
+	accdet_data.index = 0;
+	accdet_data.state = 0;
 
+	ret = switch_dev_register(&accdet_data);
+	if (ret) {
+		dev_err(codec->dev, "%s: Failed to register h2w\n", __func__);
+		return -ENOMEM;
+	}
+#endif
 	msm8x16_wcd_priv->mclk_enabled = false;
 	msm8x16_wcd_priv->clock_active = false;
 	msm8x16_wcd_priv->config_mode_active = false;
@@ -6163,8 +6221,10 @@ static int msm8x16_wcd_spmi_probe(struct spmi_device *spmi)
 
 	dev_dbg(&spmi->dev, "%s(%d):slave ID = 0x%x\n",
 		__func__, __LINE__,  spmi->sid);
+#ifndef CONFIG_MACH_XIAOMI_MARKW
 	printk("%s(%d):slave ID = 0x%x\n",
 		__func__, __LINE__,  spmi->sid);
+#endif
 	adsp_state = apr_get_subsys_state();
 	if (adsp_state != APR_SUBSYS_LOADED) {
 		dev_dbg(&spmi->dev, "Adsp is not loaded yet %d\n",
