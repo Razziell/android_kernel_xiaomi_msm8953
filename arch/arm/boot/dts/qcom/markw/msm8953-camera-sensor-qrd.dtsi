@@ -39,6 +39,7 @@
 		cell-index = <0>;
 		reg = <0x00>;
 		qcom,eeprom-name = "s5k3l8";
+		qcom,slave-addr = <0xA0>;
 		compatible = "qcom,eeprom";
 		qcom,cci-master = <0>;
 		qcom,num-blocks = <1>;
