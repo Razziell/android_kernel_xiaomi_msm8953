@@ -33,11 +33,7 @@
 #define CCI_MAX_DELAY 1000000
 
 #ifdef CONFIG_MACH_XIAOMI_MARKW
-#if 1
-#define CCI_TIMEOUT msecs_to_jiffies(1000)
-#else
 #define CCI_TIMEOUT msecs_to_jiffies(100)
-#endif
 #else
 #define CCI_TIMEOUT msecs_to_jiffies(800)
 #endif
