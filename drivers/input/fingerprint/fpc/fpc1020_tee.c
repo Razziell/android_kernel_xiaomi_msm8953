@@ -599,7 +599,7 @@ static const struct dev_pm_ops fpc1020_pm_ops = {
 
 static struct of_device_id fpc1020_of_match[] = {
 #ifdef CONFIG_MACH_XIAOMI_MARKW
-	{ .compatible = "soc,fpc1020", },
+	{ .compatible = "soc:fpc1020", },
 #else
 	{ .compatible = "fpc,fpc1020", },
 #endif
