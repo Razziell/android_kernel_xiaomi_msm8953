@@ -514,16 +514,16 @@ static int32_t msm_flash_low(
 
 	CDBG("Enter\n");
 	/* Turn off flash triggers */
-#ifdef CONFIG_MACH_XIAOMI_MARKW
-	for (i = 0; i < flash_ctrl->torch_num_sources - 1; i++)
-#else
 	for (i = 0; i < flash_ctrl->flash_num_sources; i++)
-#endif
 		if (flash_ctrl->flash_trigger[i])
 			led_trigger_event(flash_ctrl->flash_trigger[i], 0);
 
 	/* Turn on flash triggers */
+#ifdef CONFIG_MACH_XIAOMI_MARKW
+	for (i = 0; i < flash_ctrl->torch_num_sources - 1; i++) {
+#else
 	for (i = 0; i < flash_ctrl->torch_num_sources; i++) {
+#endif
 		if (flash_ctrl->torch_trigger[i]) {
 			max_current = flash_ctrl->torch_max_current[i];
 			if (flash_data->flash_current[i] >= 0 &&
