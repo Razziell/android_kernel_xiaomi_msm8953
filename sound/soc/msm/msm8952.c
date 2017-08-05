@@ -113,12 +113,12 @@ static struct wcd_mbhc_config mbhc_cfg = {
 	.mono_stero_detection = false,
 	.swap_gnd_mic = NULL,
 	.hs_ext_micbias = false,
+	.key_code[0] = KEY_MEDIA,
 #ifdef CONFIG_MACH_XIAOMI_MARKW
 	.key_code[1] = KEY_PREVIOUSSONG_NEW,
 	.key_code[2] = KEY_NEXTSONG_NEW,
 	.key_code[3] = KEY_VOICECOMMAND,
 #else
-	.key_code[0] = KEY_MEDIA,
 	.key_code[1] = BTN_1,
 	.key_code[2] = BTN_2,
 	.key_code[3] = 0,
