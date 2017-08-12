@@ -5381,7 +5381,7 @@ static void fg_external_power_changed(struct power_supply *psy)
 	struct fg_chip *chip = container_of(psy, struct fg_chip, bms_psy);
 	bool input_present = is_input_present(chip);
 
-	if (input_present ^ chip->rslow_comp.active &&
+	if (input_present && chip->rslow_comp.active &&
 			chip->rslow_comp.chg_rs_to_rslow > 0 &&
 			chip->rslow_comp.chg_rslow_comp_c1 > 0 &&
 			chip->rslow_comp.chg_rslow_comp_c2 > 0)
