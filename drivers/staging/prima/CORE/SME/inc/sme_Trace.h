@@ -154,9 +154,5 @@ enum {
 };
 
 void smeTraceInit(tpAniSirGlobal pMac);
-
-#ifdef SME_TRACE_RECORD
 void sme_register_debug_callback(void);
-#endif
-
 #endif //__SME_TRACE_H__
