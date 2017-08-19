@@ -143,13 +143,14 @@ static const DECLARE_TLV_DB_SCALE(digital_gain, 0, 1, 0);
 static const DECLARE_TLV_DB_SCALE(analog_gain, 0, 25, 1);
 static struct snd_soc_dai_driver msm8x16_wcd_i2s_dai[];
 /* By default enable the internal speaker boost */
-static bool spkr_boost_en = true;
-
 #ifdef CONFIG_MACH_XIAOMI_MARKW
 static struct switch_dev accdet_data;
 static int accdet_state;
-#endif
 
+static bool spkr_boost_en;
+#else
+static bool spkr_boost_en = true;
+#endif
 
 #define MSM8X16_WCD_ACQUIRE_LOCK(x) \
 	mutex_lock_nested(&x, SINGLE_DEPTH_NESTING)
