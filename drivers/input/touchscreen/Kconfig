@@ -1160,6 +1160,20 @@ config TOUCHSCREEN_MAXIM_STI
 	  To compile this driver as a module, choose M here: the
 	  module will be called maxim_sti.
 
+
+config TOUCHSCREEN_STATE_NOTIFIER
+	bool "Notify screen state to touch driver"
+	depends on FB_MSM_MDSS
+	default y
+	help
+	  Report the current screen state (Active/Suspended) to kernel
+	  space. This could be used by another kernel (and user) space
+	  drivers to handle some simple tasks depending on the device's
+	  current state.
+
+	  Note that State Notifier uses 5 seconds delay (by default)
+	  before swithcing to STATE_SUSPEND.
+
 source "drivers/input/touchscreen/gt9xx/Kconfig"
 
 config TOUCHSCREEN_FT5346
