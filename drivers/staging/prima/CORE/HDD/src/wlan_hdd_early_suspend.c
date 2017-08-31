@@ -2583,7 +2583,7 @@ err_unregister_pmops:
    hddDeregisterPmOps(pHddCtx);
 
 err_bap_stop:
-#if defined(CONFIG_POWERSUSPEND) || defined(CONFIG_HAS_EARLYSUSPEND)
+#ifdef CONFIG_HAS_EARLYSUSPEND
    hdd_unregister_mcast_bcast_filter(pHddCtx);
 #endif
    hdd_close_all_adapters(pHddCtx);
