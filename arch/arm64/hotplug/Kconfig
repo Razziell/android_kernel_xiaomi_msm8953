@@ -14,5 +14,3 @@ config ASMP
 	  For MPU based protection-enabled targets please refer to
 	  MSM_KERNEL_PROTECT_MPU
 
-endif
-
