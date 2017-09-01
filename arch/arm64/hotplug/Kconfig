@@ -1,6 +1,6 @@
 config ASMP
  	bool "Multi-core automatic hotplug support"
- 	depends on SMP
+ 	depends on SMP && TOUCHSCREEN_STATE_NOTIFIER
  	default n
  	help
  	Automatically hotplugs the multiple cpu cores on and off
@@ -13,13 +13,6 @@ config ASMP
 
 	  For MPU based protection-enabled targets please refer to
 	  MSM_KERNEL_PROTECT_MPU
-
-if ASMP
-
-config ASMP_SUSPEND
-	bool "Enable PowerSuspend/EarlySuspend support for ASMP"
-	depends on ASMP
-	default y
 
 endif
 
