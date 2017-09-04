@@ -48,7 +48,7 @@ static struct asmp_tunables {
 	int cycle_down;
 } tunables = {
 	.delay = 50,
-	.scroff_single_core = 1,
+	.scroff_single_core = 0,
 	.max_cpus = CONFIG_NR_CPUS,
 	.min_cpus = 2,
 	.cpufreq_up = 60,
@@ -126,9 +126,10 @@ static void asmp_suspend(void)
 			if (cpu > 0 && cpu_online(cpu))
 				cpu_down(cpu);
 		}
+		cancel_delayed_work_sync(&asmp_work);
 	}
 
-	cancel_delayed_work_sync(&asmp_work);
+	
 
 	pr_info("%s: suspended\n", __func__);
 }
@@ -149,10 +150,10 @@ static void asmp_resume(void)
 			if (!cpu_online(cpu))
 				cpu_up(cpu);
 		}
+		queue_delayed_work(asmp_wq, &asmp_work, msecs_to_jiffies(tunables.delay));
 	}
 
-	queue_delayed_work(asmp_wq, &asmp_work,
-		msecs_to_jiffies(tunables.delay));
+	
 
 	pr_info("%s: resumed\n", __func__);
 }
