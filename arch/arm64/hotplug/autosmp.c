@@ -217,7 +217,6 @@ static void __ref asmp_hotplug_stop(void)
 	cancel_delayed_work_sync(&asmp_work);
 
 	state_unregister_client(&asmp_suspend_notif);
-	asmp_suspend_notif.notifier_call = NULL;
 
 	destroy_workqueue(asmp_wq);
 
