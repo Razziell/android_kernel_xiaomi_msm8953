@@ -47,7 +47,7 @@ static struct asmp_tunables {
 	int cycle_up;
 	int cycle_down;
 } tunables = {
-	.delay = 50,
+	.delay = 100,
 	.scroff_single_core = 0,
 	.max_cpus = CONFIG_NR_CPUS,
 	.min_cpus = 2,
