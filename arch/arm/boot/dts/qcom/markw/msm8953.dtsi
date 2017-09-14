@@ -1240,10 +1240,16 @@
 		reg-names = "fuse-base";
 	};
 
-	sn_fuse: snfuse@0xa4128 {
+	sn_fuse: snfuse@0xa0128 {
 		compatible = "qcom,sn-fuse";
-		reg = <0xa4128 0x4>;
+		reg = <0xa0128 0x4>;
 		reg-names = "sn-base";
+	};
+
+	sec_boot_fuse: secbootfuse@0xa41d0 {
+		compatible = "qcom,sec-boot-fuse";
+		reg = <0xa41d0 0x4>;
+		reg-names = "sec-boot-base";
 	};
 
 	jtag_mm0: jtagmm@619c000 {
