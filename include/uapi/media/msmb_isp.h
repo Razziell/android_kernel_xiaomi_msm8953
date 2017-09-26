@@ -6,7 +6,9 @@
 #define MAX_PLANES_PER_STREAM 3
 #define MAX_NUM_STREAM 7
 
+#ifndef CONFIG_MACH_XIAOMI_MARKW
 #define ISP_VERSION_48        48
+#endif
 #define ISP_VERSION_47        47
 #define ISP_VERSION_46        46
 #define ISP_VERSION_44        44
@@ -18,8 +20,10 @@
 #define ISP_META_CHANNEL_BIT  (0x10000 << 3)
 #define ISP_SCRATCH_BUF_BIT   (0x10000 << 4)
 #define ISP_OFFLINE_STATS_BIT (0x10000 << 5)
+#ifndef CONFIG_MACH_XIAOMI_MARKW
 #define ISP_SVHDR_IN_BIT      (0x10000 << 6) /* RDI hw stream for SVHDR */
 #define ISP_SVHDR_OUT_BIT     (0x10000 << 7) /* SVHDR output bufq stream*/
+#endif
 
 #define ISP_STATS_STREAM_BIT  0x80000000
 
@@ -261,6 +265,7 @@ struct msm_vfe_fetch_eng_start {
 	uint32_t frame_id;
 };
 
+#ifndef CONFIG_MACH_XIAOMI_MARKW
 enum msm_vfe_fetch_eng_pass {
 	OFFLINE_FIRST_PASS,
 	OFFLINE_SECOND_PASS,
@@ -280,6 +285,7 @@ struct msm_vfe_fetch_eng_multi_pass_start {
 	enum msm_vfe_fetch_eng_pass  offline_pass;
 	uint32_t output_stream_id;
 };
+#endif
 
 struct msm_vfe_axi_plane_cfg {
 	uint32_t output_width; /*Include padding*/
@@ -347,10 +353,14 @@ enum msm_vfe_axi_stream_update_type {
 	UPDATE_STREAM_ADD_BUFQ,
 	UPDATE_STREAM_REMOVE_BUFQ,
 	UPDATE_STREAM_SW_FRAME_DROP,
+#ifndef CONFIG_MACH_XIAOMI_MARKW
 	UPDATE_STREAM_REQUEST_FRAMES_VER2,
 	UPDATE_STREAM_OFFLINE_AXI_CONFIG,
 };
 #define UPDATE_STREAM_REQUEST_FRAMES_VER2 UPDATE_STREAM_REQUEST_FRAMES_VER2
+#else
+};
+#endif
 
 enum msm_vfe_iommu_type {
 	IOMMU_ATTACH,
@@ -373,12 +383,14 @@ struct msm_vfe_axi_stream_cfg_update_info {
 	struct msm_isp_sw_framskip sw_skip_info;
 };
 
+#ifndef CONFIG_MACH_XIAOMI_MARKW
 struct msm_vfe_axi_stream_cfg_update_info_req_frm {
 	uint32_t stream_handle;
 	uint32_t user_stream_id;
 	uint32_t frame_id;
 	uint32_t buf_index;
 };
+#endif
 
 struct msm_vfe_axi_halt_cmd {
 	uint32_t stop_camif;
@@ -402,11 +414,16 @@ struct msm_vfe_axi_stream_update_cmd {
 	 * For backward compatibility, ensure 1st member of any struct
 	 * in union below is uint32_t stream_handle.
 	 */
+#ifndef CONFIG_MACH_XIAOMI_MARKW
 	union {
 		struct msm_vfe_axi_stream_cfg_update_info
 					update_info[MSM_ISP_STATS_MAX];
 		struct msm_vfe_axi_stream_cfg_update_info_req_frm req_frm_ver2;
 	};
+#else
+	struct msm_vfe_axi_stream_cfg_update_info
+					update_info[MSM_ISP_STATS_MAX];
+#endif
 };
 
 struct msm_vfe_smmu_attach_cmd {
@@ -768,6 +785,7 @@ struct msm_isp_sof_info {
 	uint16_t stats_get_buf_fail_mask;
 	/* delta between master and slave */
 	struct msm_isp_ms_delta_info ms_delta_info;
+#ifndef CONFIG_MACH_XIAOMI_MARKW
 	/*
 	 * mask with AXI_SRC in paused state. In PAUSED
 	 * state there is no Buffer output. So this mask is used
@@ -779,6 +797,9 @@ struct msm_isp_sof_info {
 };
 #define AXI_UPDATING_MASK 1
 #define REG_UPDATE_FAIL_MASK_EXT 1
+#else
+};
+#endif
 
 struct msm_isp_event_data {
 	/*Wall clock except for buffer divert events
@@ -807,6 +828,7 @@ struct msm_isp_event_data {
 	} u; /* union can have max 52 bytes */
 };
 
+#ifndef CONFIG_MACH_XIAOMI_MARKW
 enum msm_vfe_ahb_clk_vote {
 	MSM_ISP_CAMERA_AHB_SVS_VOTE = 1,
 	MSM_ISP_CAMERA_AHB_TURBO_VOTE = 2,
@@ -818,6 +840,7 @@ struct msm_isp_ahb_clk_cfg {
 	uint32_t vote;
 	uint32_t reserved[2];
 };
+#endif
 
 #define V4L2_PIX_FMT_QBGGR8  v4l2_fourcc('Q', 'B', 'G', '8')
 #define V4L2_PIX_FMT_QGBRG8  v4l2_fourcc('Q', 'G', 'B', '8')
@@ -842,7 +865,9 @@ struct msm_isp_ahb_clk_cfg {
 #define V4L2_PIX_FMT_NV14 v4l2_fourcc('N', 'V', '1', '4')
 #define V4L2_PIX_FMT_NV41 v4l2_fourcc('N', 'V', '4', '1')
 #define V4L2_PIX_FMT_META v4l2_fourcc('Q', 'M', 'E', 'T')
+#ifndef CONFIG_MACH_XIAOMI_MARKW
 #define V4L2_PIX_FMT_META10 v4l2_fourcc('Q', 'M', '1', '0')
+#endif
 #define V4L2_PIX_FMT_SBGGR14 v4l2_fourcc('B', 'G', '1', '4') /* 14 BGBG.GRGR.*/
 #define V4L2_PIX_FMT_SGBRG14 v4l2_fourcc('G', 'B', '1', '4') /* 14 GBGB.RGRG.*/
 #define V4L2_PIX_FMT_SGRBG14 v4l2_fourcc('B', 'A', '1', '4') /* 14 GRGR.BGBG.*/
@@ -874,8 +899,10 @@ enum msm_isp_ioctl_cmd_code {
 	MSM_ISP_SET_DUAL_HW_MASTER_SLAVE,
 	MSM_ISP_MAP_BUF_START_FE,
 	MSM_ISP_UNMAP_BUF,
+#ifndef CONFIG_MACH_XIAOMI_MARKW
 	MSM_ISP_FETCH_ENG_MULTI_PASS_START,
 	MSM_ISP_MAP_BUF_START_MULTI_PASS_FE,
+#endif
 };
 
 #define VIDIOC_MSM_VFE_REG_CFG \
@@ -978,6 +1005,7 @@ enum msm_isp_ioctl_cmd_code {
 	_IOWR('V', MSM_ISP_UNMAP_BUF, \
 		struct msm_isp_unmap_buf_req)
 
+#ifndef CONFIG_MACH_XIAOMI_MARKW
 #define VIDIOC_MSM_ISP_AHB_CLK_CFG \
 	_IOWR('V', BASE_VIDIOC_PRIVATE+25, struct msm_isp_ahb_clk_cfg)
 
@@ -988,4 +1016,6 @@ enum msm_isp_ioctl_cmd_code {
 #define VIDIOC_MSM_ISP_MAP_BUF_START_MULTI_PASS_FE \
 	_IOWR('V', MSM_ISP_MAP_BUF_START_MULTI_PASS_FE, \
 		struct msm_vfe_fetch_eng_multi_pass_start)
+#endif
+
 #endif /* __MSMB_ISP__ */
