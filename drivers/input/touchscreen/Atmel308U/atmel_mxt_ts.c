@@ -5926,6 +5926,39 @@ static void create_ctp_proc(void)
 }
 #endif
 
+static int mxt_proc_init(struct kernfs_node *sysfs_node_parent)
+{
+	int ret = 0;
+	char *buf, *path = NULL;
+	char *double_tap_sysfs_node;
+	struct proc_dir_entry *proc_entry_tp = NULL;
+	struct proc_dir_entry *proc_symlink_tmp = NULL;
+	buf = kzalloc(PATH_MAX, GFP_KERNEL);
+	if (buf)
+	       path = kernfs_path(sysfs_node_parent, buf, PATH_MAX);
+	proc_entry_tp = proc_mkdir("gesture", NULL);
+	if (proc_entry_tp == NULL) {
+	       pr_err("%s: Couldn't create gesture dir in procfs\n", __func__);
+	       ret = -ENOMEM;
+	}
+
+	double_tap_sysfs_node = kzalloc(PATH_MAX, GFP_KERNEL);
+	if (double_tap_sysfs_node)
+	       sprintf(double_tap_sysfs_node, "/sys%s/%s", path, "wakeup_mode");
+	proc_symlink_tmp = proc_symlink("onoff",
+	       proc_entry_tp, double_tap_sysfs_node);
+	if (proc_symlink_tmp == NULL) {
+	       ret = -ENOMEM;
+	       pr_err("%s: Couldn't create double_tap_enable symlink\n", __func__);
+	}
+
+	kfree(buf);
+	kfree(double_tap_sysfs_node);
+	return ret;
+}
+
+
+
 static int mxt_probe(struct i2c_client *client,
 		const struct i2c_device_id *id)
 {
@@ -6114,6 +6147,7 @@ static int mxt_probe(struct i2c_client *client,
 #if CTP_PROC_INTERFACE
 	create_ctp_proc();
 #endif
+	mxt_proc_init(client->dev.kobj.sd);
 	CTP_DEBUG("Atmel Probe done");
 	return 0;
 
