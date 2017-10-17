@@ -562,7 +562,8 @@ int msm_camera_regulator_enable(struct msm_cam_regulator *vdd_info,
 	}
 	CDBG("cnt : %d\n", cnt);
 
-			if (tmp && !IS_ERR_OR_NULL(tmp->vdd)) {
+	for (i = 0; i < cnt; i++) {
+		if (tmp && !IS_ERR_OR_NULL(tmp->vdd)) {
 			CDBG("name : %s, enable : %d\n", tmp->name, enable);
 			if (enable) {
 				rc = regulator_enable(tmp->vdd);
