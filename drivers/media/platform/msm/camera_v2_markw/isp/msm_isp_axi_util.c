@@ -2857,7 +2857,7 @@ static int msm_isp_stop_axi_stream(struct vfe_device *vfe_dev,
 				clear_comp_mask(vfe_dev, stream_info);
 		else
 			vfe_dev->hw_info->vfe_ops.axi_ops.
-				clear_wm_irq_mask(vfe_dev, stream_info)
+				clear_wm_irq_mask(vfe_dev, stream_info);
 
 		stream_info->state = STOP_PENDING;
 		if (!halt && !ext_read &&
