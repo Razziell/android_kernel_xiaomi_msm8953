@@ -656,6 +656,13 @@ void msm_vfe47_process_epoch_irq(struct vfe_device *vfe_dev,
 	}
 }
 
+void msm_isp47_process_eof_irq(struct vfe_device *vfe_dev,
+ 	uint32_t irq_status0)
+{
+ 	if (irq_status0 & BIT(1))
+ 		vfe_dev->axi_data.src_info[VFE_PIX_0].eof_id++;
+}
+
 void msm_vfe47_reg_update(struct vfe_device *vfe_dev,
 	enum msm_vfe_input_src frame_src)
 {
@@ -1457,7 +1464,7 @@ void msm_vfe47_update_camif_state(struct vfe_device *vfe_dev,
 		msm_camera_io_w(0x0, vfe_dev->vfe_base + 0x64);
 		msm_camera_io_w(0x81, vfe_dev->vfe_base + 0x68);
 		msm_camera_io_w(0x1, vfe_dev->vfe_base + 0x58);
-		msm_vfe47_config_irq(vfe_dev, 0x15, 0x81,
+		msm_vfe47_config_irq(vfe_dev, 0x17, 0x81,
 					MSM_ISP_IRQ_ENABLE);
 
 		if ((vfe_dev->hvx_cmd > HVX_DISABLE) &&
@@ -2668,6 +2675,7 @@ struct msm_vfe_hardware_info vfe47_hw_info = {
 			.process_stats_irq = msm_isp_process_stats_irq,
 			.process_epoch_irq = msm_vfe47_process_epoch_irq,
 			.config_irq = msm_vfe47_config_irq,
+			.process_eof_irq = msm_isp47_process_eof_irq,
 		},
 		.axi_ops = {
 			.reload_wm = msm_vfe47_axi_reload_wm,
