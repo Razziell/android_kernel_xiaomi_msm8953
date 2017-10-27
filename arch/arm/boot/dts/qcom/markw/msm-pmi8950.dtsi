@@ -203,7 +203,8 @@
 			#size-cells = <1>;
 
 			qcom,iterm-ma = <100>;
-			qcom,resume-delta-mv = <200>;
+			qcom,float-voltage-mv = <4400>;
+			qcom,resume-delta-mv = <50>;
 			qcom,chg-inhibit-fg;
 			qcom,rparasitic-uohm = <100000>;
 			qcom,bms-psy-name = "bms";
@@ -322,6 +323,8 @@
 			qcom,fg-cutoff-voltage-mv = <3500>;
 			qcom,cycle-counter-en;
 			qcom,capacity-learning-on;
+			qcom,fg-cc-cv-threshold-mv = <4380>;
+			qcom,fg-vbat-estimate-diff-mv = <200>;
 
 			qcom,fg-soc@4000 {
 			status = "okay";
@@ -414,7 +417,7 @@
 		#size-cells = <1>;
 
 		pmi8950_pwm: pwm@b000 {
-			status = "disabled";
+			status = "okay";
 			compatible = "qcom,qpnp-pwm";
 			reg = <0xb000 0x100>;
 			reg-names = "qpnp-lpg-channel-base";
