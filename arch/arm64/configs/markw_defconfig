@@ -4589,7 +4589,7 @@ CONFIG_QMI_ENCDEC=y
 # CONFIG_STRICT_MEMORY_RWX is not set
 # Experimental
 # Add hotplug
-CONFIG_ASMP=y
+# CONFIG_ASMP  is not set
 # Add fingenprint boost
 CONFIG_FINGERPRINT_BOOST=y
 CONFIG_BOEFFLA_WL_BLOCKER=y
