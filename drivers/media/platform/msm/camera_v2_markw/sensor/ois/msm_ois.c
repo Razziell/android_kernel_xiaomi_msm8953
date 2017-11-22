@@ -861,7 +861,7 @@ static int32_t msm_ois_platform_probe(struct platform_device *pdev)
 	rc = of_property_read_u32((&pdev->dev)->of_node, "cell-index",
 		&pdev->id);
 	CDBG("cell-index %d, rc %d\n", pdev->id, rc);
-	if (rc < 0) {;
+	if (rc < 0) {
 		pr_err("failed rc %d\n", rc);
 		goto release_memory;
 	}
