@@ -27,6 +27,33 @@
 		bootargs = "sched_enable_hmp=1 sched_enable_power_aware=1 androidboot.selinux=permissive";
 	};
 
+	cpus {
+		cpu@0 {
+			clock-frequency = <2016000>;
+		};
+		cpu@1 {
+			clock-frequency = <2016000>;
+		};
+		cpu@2 {
+			clock-frequency = <2016000>;
+		};
+		cpu@3 {
+			clock-frequency = <2016000>;
+		};
+		cpu@100 {
+			clock-frequency = <2016000>;
+		};
+		cpu@101 {
+			clock-frequency = <2016000>;
+		};
+		cpu@102 {
+			clock-frequency = <2016000>;
+		};
+		cpu@103 {
+			clock-frequency = <2016000>;
+		};
+	};
+	
 	reserved-memory {
 		#address-cells = <2>;
 		#size-cells = <2>;
