@@ -269,8 +269,6 @@ static int do_cpu_boost(struct notifier_block *nb,
 		if (ret)
 			set_boost_freq(b, policy->cpu, boost_freq);
 		policy->min = min(policy->max, boost_freq);
-	} else {
-		policy->min = policy->cpuinfo.min_freq;
 	}
 
 	return NOTIFY_OK;
